@@ -1,0 +1,119 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", serif;
+  
+  --color-brand-green: #3A9E5F;
+  --color-brand-lime: #A8E28F;
+  --color-brand-orange: #E4741E;
+  --color-warm-white: #FAF9F6;
+
+  --color-dark-bg: #0A0A0A;
+  --color-dark-bg-card: #13ECF3;
+  --color-dark-card: #141414;
+  --color-dark-text: #F5F5F5;
+  --color-dark-border: #1F1F1F;
+  
+  --shadow-contrast: 0 0 20px rgba(255, 255, 255, 0.5), 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+@layer base {
+  body {
+    @apply bg-warm-white text-brand-green font-sans antialiased transition-colors duration-300;
+  }
+
+  .dark body {
+    @apply bg-dark-bg text-dark-text;
+    --shadow-contrast: 0 0 20px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(255, 255, 255, 0.1);
+  }
+  
+  h1, h2, h3, h4 {
+    @apply font-serif italic;
+  }
+}
+
+.glass {
+  @apply bg-white/70 backdrop-blur-md border border-white/20 transition-colors duration-300;
+}
+
+.dark .glass {
+  @apply bg-dark-card/70 border-dark-border/50;
+}
+
+.dark .bg-white {
+  @apply bg-dark-card;
+}
+
+.dark .text-brand-green {
+  @apply text-dark-text;
+}
+
+.dark .text-brand-green\/70 {
+  @apply text-dark-text/70;
+}
+
+.dark .text-brand-green\/60 {
+  @apply text-dark-text/60;
+}
+
+.dark .text-brand-green\/40 {
+  @apply text-dark-text/40;
+}
+
+.dark .border-brand-green\/10 {
+  @apply border-dark-border;
+}
+
+.dark .hover:bg-brand-green\/5:hover {
+  @apply hover:bg-white/5;
+}
+
+.dark .bg-warm-white {
+  @apply bg-dark-bg;
+}
+
+.dark .bg-warm-white\/10 {
+  @apply bg-white/5;
+}
+
+.dark .bg-brand-lime\/10 {
+  @apply bg-white/5;
+}
+
+.dark .bg-brand-lime\/5 {
+  @apply bg-white/5;
+}
+
+.dark .bg-brand-lime\/20 {
+  @apply bg-white/10;
+}
+
+.dark input, .dark select, .dark textarea {
+  @apply bg-white/5 text-dark-text border-dark-border;
+}
+
+.dark .shadow-xl {
+  @apply shadow-black/40;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+.text-contrast {
+  text-shadow: var(--shadow-contrast);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-brand-green/10 rounded-full hover:bg-brand-green/20 transition-colors;
+}
