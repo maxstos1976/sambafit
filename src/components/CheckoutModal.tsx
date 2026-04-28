@@ -36,7 +36,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, i
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const allGiftCards = items.length > 0 && items.every(item => item.isGiftCard);
-  const shippingCost = allGiftCards ? 0 : 5.99;
+  const shippingCost = allGiftCards ? 0 : 8.59;
   const totalBeforeDiscount = subtotal + shippingCost;
   const finalTotalEUR = Math.max(0, totalBeforeDiscount - discountAmount);
 
@@ -79,9 +79,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, i
       alert(t.loginToFavorite);
       return;
     }
-    
+
     setIsLoading(true);
-    
+
     try {
       // Simulate payment processing if there's still a balance
       if (finalTotalEUR > 0) {
@@ -144,14 +144,14 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, i
           onClick={onClose}
           className="absolute inset-0 bg-brand-green/40 backdrop-blur-md"
         />
-        
+
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
           className="relative w-full max-w-4xl bg-warm-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]"
         >
-          <button 
+          <button
             onClick={onClose}
             className="absolute top-6 right-6 z-10 p-2 text-brand-green/40 hover:text-brand-orange transition-colors"
           >
@@ -161,7 +161,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, i
           {/* Order Summary */}
           <div className="w-full md:w-5/12 bg-brand-lime/10 p-8 md:p-12 overflow-y-auto custom-scrollbar">
             <h2 className="text-3xl font-serif italic font-bold text-brand-green mb-8">{t.orderSummary}</h2>
-            
+
             <div className="space-y-6 mb-8">
               {items.map((item) => (
                 <div key={`${item.id}-${item.selectedSize}`} className="flex gap-4">
@@ -225,9 +225,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, i
                 <span>{t.shippingCost}</span>
                 <span>€{shippingCost.toFixed(2)}</span>
               </div>
-              
+
               {discountAmount > 0 && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   className="flex justify-between text-brand-orange font-bold text-sm"
@@ -269,11 +269,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, i
                   <button
                     key={curr}
                     onClick={() => handleCurrencyChange(curr)}
-                    className={`py-2 rounded-xl text-xs font-bold transition-all ${
-                      currency === curr 
-                        ? 'bg-brand-green text-white shadow-md' 
+                    className={`py-2 rounded-xl text-xs font-bold transition-all ${currency === curr
+                        ? 'bg-brand-green text-white shadow-md'
                         : 'bg-white text-brand-green/60 hover:bg-brand-lime/20'
-                    }`}
+                      }`}
                   >
                     {curr}
                   </button>
@@ -296,18 +295,17 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, i
               <form onSubmit={handlePay} className="space-y-8">
                 <div>
                   <h2 className="text-3xl font-serif italic font-bold text-brand-green mb-8">{t.checkoutTitle}</h2>
-                  
+
                   <div className="space-y-4">
                     <label className="text-xs font-bold uppercase tracking-widest text-brand-green/40">{t.paymentMethod}</label>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <button
                         type="button"
                         onClick={() => setPaymentMethod('credit_card')}
-                        className={`p-4 rounded-2xl border-2 flex flex-col items-center gap-2 transition-all ${
-                          paymentMethod === 'credit_card' 
-                            ? 'border-brand-orange bg-brand-orange/5 text-brand-orange' 
+                        className={`p-4 rounded-2xl border-2 flex flex-col items-center gap-2 transition-all ${paymentMethod === 'credit_card'
+                            ? 'border-brand-orange bg-brand-orange/5 text-brand-orange'
                             : 'border-brand-green/5 text-brand-green/40 hover:border-brand-green/20'
-                        }`}
+                          }`}
                       >
                         <CreditCard className="w-6 h-6" />
                         <span className="text-[10px] font-bold uppercase tracking-widest">{t.creditCard}</span>
@@ -315,11 +313,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, i
                       <button
                         type="button"
                         onClick={() => setPaymentMethod('paypal')}
-                        className={`p-4 rounded-2xl border-2 flex flex-col items-center gap-2 transition-all ${
-                          paymentMethod === 'paypal' 
-                            ? 'border-brand-orange bg-brand-orange/5 text-brand-orange' 
+                        className={`p-4 rounded-2xl border-2 flex flex-col items-center gap-2 transition-all ${paymentMethod === 'paypal'
+                            ? 'border-brand-orange bg-brand-orange/5 text-brand-orange'
                             : 'border-brand-green/5 text-brand-green/40 hover:border-brand-green/20'
-                        }`}
+                          }`}
                       >
                         <Wallet className="w-6 h-6" />
                         <span className="text-[10px] font-bold uppercase tracking-widest">{t.paypal}</span>
@@ -327,11 +324,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, i
                       <button
                         type="button"
                         onClick={() => setPaymentMethod('bizum')}
-                        className={`p-4 rounded-2xl border-2 flex flex-col items-center gap-2 transition-all ${
-                          paymentMethod === 'bizum' 
-                            ? 'border-brand-orange bg-brand-orange/5 text-brand-orange' 
+                        className={`p-4 rounded-2xl border-2 flex flex-col items-center gap-2 transition-all ${paymentMethod === 'bizum'
+                            ? 'border-brand-orange bg-brand-orange/5 text-brand-orange'
                             : 'border-brand-green/5 text-brand-green/40 hover:border-brand-green/20'
-                        }`}
+                          }`}
                       >
                         <Smartphone className="w-6 h-6" />
                         <span className="text-[10px] font-bold uppercase tracking-widest">{t.bizum}</span>
@@ -380,8 +376,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, i
                       {paymentMethod === 'paypal' ? <Wallet className="w-8 h-8 text-blue-600" /> : <Smartphone className="w-8 h-8 text-brand-green" />}
                     </div>
                     <p className="text-brand-green/60 font-medium">
-                      {paymentMethod === 'paypal' 
-                        ? 'You will be redirected to PayPal to complete your purchase securely.' 
+                      {paymentMethod === 'paypal'
+                        ? 'You will be redirected to PayPal to complete your purchase securely.'
                         : 'Open your Bizum app and authorize the payment to SambaFit.'}
                     </p>
                   </div>
