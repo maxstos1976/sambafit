@@ -1,17 +1,17 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  Users, 
-  Package, 
-  Database, 
+import {
+  Users,
+  Package,
+  Database,
   BarChart3,
-  Plus, 
-  Edit2, 
-  Trash2, 
-  Save, 
-  X, 
-  Check, 
+  Plus,
+  Edit2,
+  Trash2,
+  Save,
+  X,
+  Check,
   Loader2,
   ChevronRight,
   ChevronLeft,
@@ -32,13 +32,13 @@ import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { Product, Collection, Category } from '../types';
 import { useSocket } from '../context/SocketContext';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
   ResponsiveContainer
 } from 'recharts';
 import { Button } from './ui/Button';
@@ -54,27 +54,27 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
   const { t } = useLanguage();
   const { socket } = useSocket();
   const [activeTab, setActiveTab] = useState<'products' | 'users' | 'system' | 'reports' | 'collections' | 'categories' | 'orders' | 'giftCards'>('products');
-  
+
   // Gestão de Produtos
   const [products, setProducts] = useState<Product[]>([]);
-  
+
   // Gestão de Usuários
   const [users, setUsers] = useState<any[]>([]);
-  
+
   // Gestão de Pedidos
   const [orders, setOrders] = useState<any[]>([]);
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const [selectedOrderIds, setSelectedOrderIds] = useState<string[]>([]);
-  
+
   // Gestão de Cartões Presente
   const [giftCards, setGiftCards] = useState<any[]>([]);
-  
+
   // Gestão de Coleções
   const [collections, setCollections] = useState<Collection[]>([]);
-  
+
   // Gestão de Categorias
   const [categories, setCategories] = useState<Category[]>([]);
-  
+
   // Relatórios e Análises
   const [stats, setStats] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -100,7 +100,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
   const handleSeed = async () => {
     if (!user) return;
     if (!confirm('Isso irá apagar dados atuais e gerar novos dados de teste para relatórios. Deseja continuar?')) return;
-    
+
     setIsLoading(true);
     try {
       await adminApi.seedDatabase();
@@ -125,7 +125,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
 
     const handleUpdate = (payload: { type: string; data?: any }) => {
       console.log('Real-time update received:', payload);
-      
+
       // If we are on the reports tab, refresh stats for any data change
       if (activeTab === 'reports') {
         fetchData();
@@ -203,15 +203,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
     try {
       const colls = full ? '' : selectedBackupCollections.join(',');
       const url = `/api/backup/download?${colls ? `collections=${colls}` : ''}`;
-      
+
       const response = await fetch(url, {
         headers: {
           'Authorization': `Bearer ${user.token}`
         }
       });
-      
+
       if (!response.ok) throw new Error('Falha ao gerar backup');
-      
+
       const blob = await response.blob();
       const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -228,7 +228,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
   };
 
   const toggleBackupCollection = (coll: string) => {
-    setSelectedBackupCollections(prev => 
+    setSelectedBackupCollections(prev =>
       prev.includes(coll) ? prev.filter(c => c !== coll) : [...prev, coll]
     );
   };
@@ -399,7 +399,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
   const handleDeleteOrder = async (id: string) => {
     if (!user) return;
     if (!confirm('Deseja realmente excluir este pedido?')) return;
-    
+
     setIsActionLoading(true);
     try {
       await orderApi.delete(user.token, id);
@@ -414,7 +414,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
   const handleDeleteSelectedOrders = async () => {
     if (!user || selectedOrderIds.length === 0) return;
     if (!confirm(`Deseja realmente excluir os ${selectedOrderIds.length} pedidos selecionados?`)) return;
-    
+
     setIsActionLoading(true);
     try {
       await orderApi.deleteMultiple(user.token, selectedOrderIds);
@@ -430,7 +430,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
   const handleDeleteAllOrders = async () => {
     if (!user) return;
     if (!confirm('Deseja realmente excluir TODOS os pedidos do banco de dados? Esta ação é irreversível.')) return;
-    
+
     setIsActionLoading(true);
     try {
       await orderApi.deleteAll(user.token);
@@ -444,7 +444,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
   };
 
   const toggleOrderSelection = (id: string) => {
-    setSelectedOrderIds(prev => 
+    setSelectedOrderIds(prev =>
       prev.includes(id) ? prev.filter(orderId => orderId !== id) : [...prev, id]
     );
   };
@@ -480,14 +480,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
 
     const code = gc.code || 'DRAFT';
     const message = `Excluir permanentemente o cartão [${code}]? Esta ação removerá o registro definitivamente do banco de dados e não pode ser desfeita.`;
-    
+
     if (!user || isActionLoading || !window.confirm(message)) return;
-    
+
     setIsActionLoading(true);
     try {
       console.log('Iniciando exclusão do cartão:', id);
       const response = await giftCardApi.delete(user.token, id);
-      
+
       if (response.success || response.deletedId) {
         setGiftCards(prev => prev.filter(g => g._id !== id));
         alert(response.message || 'Cartão presente excluído permanentemente.');
@@ -531,9 +531,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
     if (!user) return;
     const current = giftCards.find(g => g._id === id);
     if (!current) return;
-    
+
     const newStatus = current.status === 'blocked' ? 'active' : 'blocked';
-    
+
     try {
       await giftCardApi.update(user.token, id, { status: newStatus });
       setGiftCards(prev => prev.map(g => g._id === id ? { ...g, status: newStatus } : g));
@@ -663,7 +663,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
 
         {/* Content */}
         <div className="flex-1 bg-white dark:bg-dark-card rounded-[2.5rem] shadow-xl p-8 border border-brand-green/5 dark:border-dark-border">
-          
+
           {/* Gestão de Produtos */}
           {activeTab === 'products' && (
             <div className="space-y-6">
@@ -807,9 +807,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
                           <td className="py-4 font-bold text-brand-green dark:text-dark-text">{coll.name}</td>
                           <td className="py-4 text-brand-green/60 dark:text-dark-text/60 text-sm max-w-xs truncate">{coll.description}</td>
                           <td className="py-4">
-                            <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${
-                              coll.active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                            }`}>
+                            <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${coll.active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                              }`}>
                               {coll.active ? 'Ativa' : 'Inativa'}
                             </span>
                           </td>
@@ -879,9 +878,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
                           <td className="py-4 font-bold text-brand-green dark:text-dark-text">{cat.name}</td>
                           <td className="py-4 text-brand-green/60 dark:text-dark-text/60 text-sm max-w-xs truncate">{cat.description}</td>
                           <td className="py-4">
-                            <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${
-                              cat.active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                            }`}>
+                            <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${cat.active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                              }`}>
                               {cat.active ? 'Ativa' : 'Inativa'}
                             </span>
                           </td>
@@ -941,11 +939,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
                             <select
                               value={u.role}
                               onChange={(e) => handleUpdateUserRole(u._id, e.target.value)}
-                              className={`border-none rounded-lg text-xs font-bold py-1 px-2 focus:ring-1 focus:ring-brand-orange transition-colors dark:[color-scheme:dark] ${
-                                theme === 'dark' 
-                                  ? 'bg-black text-white' 
+                              className={`border-none rounded-lg text-xs font-bold py-1 px-2 focus:ring-1 focus:ring-brand-orange transition-colors dark:[color-scheme:dark] ${theme === 'dark'
+                                  ? 'bg-black text-white'
                                   : 'bg-brand-lime/10 text-brand-green'
-                              }`}
+                                }`}
                             >
                               <option value="user" className={theme === 'dark' ? 'bg-black text-white' : ''}>User</option>
                               <option value="admin" className={theme === 'dark' ? 'bg-black text-white' : ''}>Admin</option>
@@ -1051,150 +1048,146 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
                               </div>
                             </td>
                             <td className="py-4">
-                            <div className="text-sm font-bold text-brand-green dark:text-dark-text">{o.user?.name} {o.user?.surname}</div>
-                            <div className="text-[10px] text-brand-green/40 dark:text-dark-text/40">{o.user?.email}</div>
-                            {o.shipping?.endereco && (
-                              <div className="mt-1 p-2 bg-brand-lime/10 rounded-lg text-[9px] text-brand-green/60 dark:text-dark-text/60 leading-tight">
-                                {o.shipping.endereco.street}, {o.shipping.endereco.city}<br />
-                                {o.shipping.endereco.state}, {o.shipping.endereco.zip}<br />
-                                {o.shipping.endereco.country}
-                              </div>
-                            )}
-                          </td>
-                          <td className="py-4 font-bold text-brand-green dark:text-dark-text">
-                            €{o.valor_total.toFixed(2)}
-                          </td>
-                          <td className="py-4">
-                            <div className="flex flex-col gap-2">
-                              <span className={`px-2 py-1 rounded-full text-[9px] font-bold uppercase w-fit ${
-                                o.status === 'Delivered' ? 'bg-green-100 text-green-700' :
-                                o.status === 'Cancelled' ? 'bg-red-100 text-red-700' :
-                                o.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                                'bg-brand-orange/10 text-brand-orange'
-                              }`}>
-                                {o.status}
-                              </span>
-                              <select
-                                value={o.status}
-                                onChange={(e) => handleUpdateOrderStatus(o._id, e.target.value, undefined)}
-                                className={`border-none rounded-lg text-[10px] font-bold py-1 px-2 focus:ring-1 focus:ring-brand-orange transition-colors dark:[color-scheme:dark] ${
-                                  theme === 'dark' 
-                                    ? 'bg-black text-white' 
-                                    : 'bg-brand-lime/10 text-brand-green'
-                                }`}
-                              >
-                                <option value="pending" className={theme === 'dark' ? 'bg-black text-white' : ''}>Pendente</option>
-                                <option value="paid" className={theme === 'dark' ? 'bg-black text-white' : ''}>Pago</option>
-                                <option value="processing" className={theme === 'dark' ? 'bg-black text-white' : ''}>Processando</option>
-                                <option value="Ready to Ship" className={theme === 'dark' ? 'bg-black text-white' : ''}>Pronto para Envio</option>
-                                <option value="Shipped" className={theme === 'dark' ? 'bg-black text-white' : ''}>Enviado</option>
-                                <option value="Delivered" className={theme === 'dark' ? 'bg-black text-white' : ''}>Entregue</option>
-                                <option value="Cancelled" className={theme === 'dark' ? 'bg-black text-white' : ''}>Cancelado</option>
-                              </select>
-                            </div>
-                          </td>
-                          <td className="py-4">
-                            <div className="flex flex-col gap-2">
-                              <div className="flex items-center gap-2">
-                                <span className="text-[10px] font-bold text-brand-green/40 uppercase tracking-widest">Método:</span>
-                                <span className="text-[10px] font-bold text-brand-green dark:text-dark-text uppercase">{o.shipping?.metodo_envio || 'N/A'}</span>
-                              </div>
-                              <select
-                                value={o.shipping?.status_envio || 'pending'}
-                                onChange={(e) => handleUpdateOrderStatus(o._id, undefined, e.target.value)}
-                                className={`border-none rounded-lg text-[10px] font-bold py-1 px-2 focus:ring-1 focus:ring-brand-orange transition-colors dark:[color-scheme:dark] ${
-                                  theme === 'dark' 
-                                    ? 'bg-black text-white' 
-                                    : 'bg-brand-lime/10 text-brand-green'
-                                }`}
-                              >
-                                <option value="pending" className={theme === 'dark' ? 'bg-black text-white' : ''}>Pendente</option>
-                                <option value="shipped" className={theme === 'dark' ? 'bg-black text-white' : ''}>Enviado</option>
-                                <option value="delivered" className={theme === 'dark' ? 'bg-black text-white' : ''}>Entregue</option>
-                                <option value="returned" className={theme === 'dark' ? 'bg-black text-white' : ''}>Devolvido</option>
-                              </select>
-                              <div className="flex flex-col gap-1">
-                                <span className="text-[10px] font-bold text-brand-green/40 uppercase tracking-widest">Rastreio:</span>
-                                <input
-                                  type="text"
-                                  placeholder="Inserir código"
-                                  defaultValue={o.shipping?.codigo_rastreamento || ''}
-                                  onBlur={(e) => {
-                                    if (e.target.value !== (o.shipping?.codigo_rastreamento || '')) {
-                                      handleUpdateOrderStatus(o._id, undefined, undefined, e.target.value);
-                                    }
-                                  }}
-                                  className={`border-none rounded-lg text-[10px] font-medium py-1 px-2 focus:ring-1 focus:ring-brand-orange transition-all w-full dark:[color-scheme:dark] ${
-                                    theme === 'dark' 
-                                      ? 'bg-black text-white border-white/10' 
+                              <div className="text-sm font-bold text-brand-green dark:text-dark-text">{o.user?.name} {o.user?.surname}</div>
+                              <div className="text-[10px] text-brand-green/40 dark:text-dark-text/40">{o.user?.email}</div>
+                              {o.shipping?.endereco && (
+                                <div className="mt-1 p-2 bg-brand-lime/10 rounded-lg text-[9px] text-brand-green/60 dark:text-dark-text/60 leading-tight">
+                                  {o.shipping.endereco.street}, {o.shipping.endereco.city}<br />
+                                  {o.shipping.endereco.state}, {o.shipping.endereco.zip}<br />
+                                  {o.shipping.endereco.country}
+                                </div>
+                              )}
+                            </td>
+                            <td className="py-4 font-bold text-brand-green dark:text-dark-text">
+                              €{o.valor_total.toFixed(2)}
+                            </td>
+                            <td className="py-4">
+                              <div className="flex flex-col gap-2">
+                                <span className={`px-2 py-1 rounded-full text-[9px] font-bold uppercase w-fit ${o.status === 'Delivered' ? 'bg-green-100 text-green-700' :
+                                    o.status === 'Cancelled' ? 'bg-red-100 text-red-700' :
+                                      o.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                                        'bg-brand-orange/10 text-brand-orange'
+                                  }`}>
+                                  {o.status}
+                                </span>
+                                <select
+                                  value={o.status}
+                                  onChange={(e) => handleUpdateOrderStatus(o._id, e.target.value, undefined)}
+                                  className={`border-none rounded-lg text-[10px] font-bold py-1 px-2 focus:ring-1 focus:ring-brand-orange transition-colors dark:[color-scheme:dark] ${theme === 'dark'
+                                      ? 'bg-black text-white'
                                       : 'bg-brand-lime/10 text-brand-green'
-                                  }`}
-                                />
-                              </div>
-                            </div>
-                          </td>
-                          <td className="py-4 text-right">
-                            <button
-                              onClick={() => handleDeleteOrder(o._id)}
-                              className="p-2 text-brand-green/20 hover:text-red-500 transition-colors"
-                              title="Excluir Pedido"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </td>
-                        </tr>
-                        {expandedOrderId === o._id && (
-                          <tr>
-                            <td colSpan={7} className="py-0 px-4">
-                              <AnimatePresence mode="wait">
-                                <motion.div
-                                  initial={{ height: 0, opacity: 0 }}
-                                  animate={{ height: 'auto', opacity: 1 }}
-                                  exit={{ height: 0, opacity: 0 }}
-                                  transition={{ duration: 0.3, ease: "easeInOut" }}
-                                  className="bg-brand-orange/[0.03] dark:bg-brand-orange/[0.05] rounded-3xl p-6 mb-6 mt-2 overflow-hidden border border-brand-orange/10"
+                                    }`}
                                 >
-                                  <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-orange mb-6 flex items-center gap-2">
-                                    <Package className="w-3.5 h-3.5" />
-                                    Conteúdo Detalhado do Pedido
-                                  </h4>
-                                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {o.items?.map((item: any, idx: number) => (
-                                      <div key={idx} className="flex items-center gap-4 p-4 bg-white dark:bg-black/20 rounded-2xl border border-brand-green/[0.03] dark:border-white/[0.03] shadow-sm">
-                                        <div className="w-14 h-14 bg-brand-green/5 dark:bg-white/5 rounded-xl flex items-center justify-center text-brand-green dark:text-dark-text font-serif italic font-bold border border-brand-green/5">
-                                          {item.nome_produto?.[0] || 'S'}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                          <div className="text-xs font-bold text-brand-green dark:text-dark-text truncate">{item.nome_produto}</div>
-                                          <div className="text-[10px] font-bold text-brand-orange uppercase tracking-wider mt-1">
-                                            Tam: {item.selectedSize} | Qtd: {item.quantidade}
-                                          </div>
-                                          <div className="text-[10px] font-medium text-brand-green/40 dark:text-dark-text/40 mt-0.5">
-                                            Subtotal: €{item.subtotal?.toFixed(2)}
-                                          </div>
-                                        </div>
-                                      </div>
-                                    ))}
-                                  </div>
-                                  <div className="mt-6 pt-6 border-t border-brand-green/5 dark:border-white/5 flex flex-wrap gap-12">
-                                    <div className="flex flex-col gap-1">
-                                      <span className="text-[9px] font-bold text-brand-green/30 dark:text-dark-text/30 uppercase tracking-widest">Resumo Financeiro</span>
-                                      <div className="flex items-baseline gap-2">
-                                        <span className="text-sm font-bold text-brand-green dark:text-dark-text">€{o.valor_total.toFixed(2)}</span>
-                                        <span className="text-[9px] font-medium text-brand-green/40 dark:text-dark-text/40">Total Líquido</span>
-                                      </div>
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                      <span className="text-[9px] font-bold text-brand-green/30 dark:text-dark-text/30 uppercase tracking-widest">Método Pagamento</span>
-                                      <span className="text-xs font-bold text-brand-green dark:text-dark-text uppercase">{o.metodo_pagamento || 'N/A'}</span>
-                                    </div>
-                                  </div>
-                                </motion.div>
-                              </AnimatePresence>
+                                  <option value="pending" className={theme === 'dark' ? 'bg-black text-white' : ''}>Pendente</option>
+                                  <option value="paid" className={theme === 'dark' ? 'bg-black text-white' : ''}>Pago</option>
+                                  <option value="processing" className={theme === 'dark' ? 'bg-black text-white' : ''}>Processando</option>
+                                  <option value="Ready to Ship" className={theme === 'dark' ? 'bg-black text-white' : ''}>Pronto para Envio</option>
+                                  <option value="Shipped" className={theme === 'dark' ? 'bg-black text-white' : ''}>Enviado</option>
+                                  <option value="Delivered" className={theme === 'dark' ? 'bg-black text-white' : ''}>Entregue</option>
+                                  <option value="Cancelled" className={theme === 'dark' ? 'bg-black text-white' : ''}>Cancelado</option>
+                                </select>
+                              </div>
+                            </td>
+                            <td className="py-4">
+                              <div className="flex flex-col gap-2">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[10px] font-bold text-brand-green/40 uppercase tracking-widest">Método:</span>
+                                  <span className="text-[10px] font-bold text-brand-green dark:text-dark-text uppercase">{o.shipping?.metodo_envio || 'N/A'}</span>
+                                </div>
+                                <select
+                                  value={o.shipping?.status_envio || 'pending'}
+                                  onChange={(e) => handleUpdateOrderStatus(o._id, undefined, e.target.value)}
+                                  className={`border-none rounded-lg text-[10px] font-bold py-1 px-2 focus:ring-1 focus:ring-brand-orange transition-colors dark:[color-scheme:dark] ${theme === 'dark'
+                                      ? 'bg-black text-white'
+                                      : 'bg-brand-lime/10 text-brand-green'
+                                    }`}
+                                >
+                                  <option value="pending" className={theme === 'dark' ? 'bg-black text-white' : ''}>Pendente</option>
+                                  <option value="shipped" className={theme === 'dark' ? 'bg-black text-white' : ''}>Enviado</option>
+                                  <option value="delivered" className={theme === 'dark' ? 'bg-black text-white' : ''}>Entregue</option>
+                                  <option value="returned" className={theme === 'dark' ? 'bg-black text-white' : ''}>Devolvido</option>
+                                </select>
+                                <div className="flex flex-col gap-1">
+                                  <span className="text-[10px] font-bold text-brand-green/40 uppercase tracking-widest">Rastreio:</span>
+                                  <input
+                                    type="text"
+                                    placeholder="Inserir código"
+                                    defaultValue={o.shipping?.codigo_rastreamento || ''}
+                                    onBlur={(e) => {
+                                      if (e.target.value !== (o.shipping?.codigo_rastreamento || '')) {
+                                        handleUpdateOrderStatus(o._id, undefined, undefined, e.target.value);
+                                      }
+                                    }}
+                                    className={`border-none rounded-lg text-[10px] font-medium py-1 px-2 focus:ring-1 focus:ring-brand-orange transition-all w-full dark:[color-scheme:dark] ${theme === 'dark'
+                                        ? 'bg-black text-white border-white/10'
+                                        : 'bg-brand-lime/10 text-brand-green'
+                                      }`}
+                                  />
+                                </div>
+                              </div>
+                            </td>
+                            <td className="py-4 text-right">
+                              <button
+                                onClick={() => handleDeleteOrder(o._id)}
+                                className="p-2 text-brand-green/20 hover:text-red-500 transition-colors"
+                                title="Excluir Pedido"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
                             </td>
                           </tr>
-                        )}
-                      </React.Fragment>
+                          {expandedOrderId === o._id && (
+                            <tr>
+                              <td colSpan={7} className="py-0 px-4">
+                                <AnimatePresence mode="wait">
+                                  <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                                    className="bg-brand-orange/[0.03] dark:bg-brand-orange/[0.05] rounded-3xl p-6 mb-6 mt-2 overflow-hidden border border-brand-orange/10"
+                                  >
+                                    <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-orange mb-6 flex items-center gap-2">
+                                      <Package className="w-3.5 h-3.5" />
+                                      Conteúdo Detalhado do Pedido
+                                    </h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                      {o.items?.map((item: any, idx: number) => (
+                                        <div key={idx} className="flex items-center gap-4 p-4 bg-white dark:bg-black/20 rounded-2xl border border-brand-green/[0.03] dark:border-white/[0.03] shadow-sm">
+                                          <div className="w-14 h-14 bg-brand-green/5 dark:bg-white/5 rounded-xl flex items-center justify-center text-brand-green dark:text-dark-text font-serif italic font-bold border border-brand-green/5">
+                                            {item.nome_produto?.[0] || 'S'}
+                                          </div>
+                                          <div className="flex-1 min-w-0">
+                                            <div className="text-xs font-bold text-brand-green dark:text-dark-text truncate">{item.nome_produto}</div>
+                                            <div className="text-[10px] font-bold text-brand-orange uppercase tracking-wider mt-1">
+                                              Tam: {item.selectedSize} | Qtd: {item.quantidade}
+                                            </div>
+                                            <div className="text-[10px] font-medium text-brand-green/40 dark:text-dark-text/40 mt-0.5">
+                                              Subtotal: €{item.subtotal?.toFixed(2)}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                    <div className="mt-6 pt-6 border-t border-brand-green/5 dark:border-white/5 flex flex-wrap gap-12">
+                                      <div className="flex flex-col gap-1">
+                                        <span className="text-[9px] font-bold text-brand-green/30 dark:text-dark-text/30 uppercase tracking-widest">Resumo Financeiro</span>
+                                        <div className="flex items-baseline gap-2">
+                                          <span className="text-sm font-bold text-brand-green dark:text-dark-text">€{o.valor_total.toFixed(2)}</span>
+                                          <span className="text-[9px] font-medium text-brand-green/40 dark:text-dark-text/40">Total Líquido</span>
+                                        </div>
+                                      </div>
+                                      <div className="flex flex-col gap-1">
+                                        <span className="text-[9px] font-bold text-brand-green/30 dark:text-dark-text/30 uppercase tracking-widest">Método Pagamento</span>
+                                        <span className="text-xs font-bold text-brand-green dark:text-dark-text uppercase">{o.metodo_pagamento || 'N/A'}</span>
+                                      </div>
+                                    </div>
+                                  </motion.div>
+                                </AnimatePresence>
+                              </td>
+                            </tr>
+                          )}
+                        </React.Fragment>
                       ))}
                     </tbody>
                   </table>
@@ -1249,12 +1242,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
                             <div className="text-brand-orange text-xs">S: €{gc.balance}</div>
                           </td>
                           <td className="py-4">
-                            <span className={`px-2 py-1 rounded-full text-[9px] font-bold uppercase ${
-                              gc.status === 'active' ? 'bg-green-100 text-green-700' :
-                              gc.status === 'blocked' ? 'bg-red-100 text-red-700' :
-                              gc.status === 'draft' ? 'bg-yellow-100 text-yellow-700' :
-                              'bg-gray-100 text-gray-700'
-                            }`}>
+                            <span className={`px-2 py-1 rounded-full text-[9px] font-bold uppercase ${gc.status === 'active' ? 'bg-green-100 text-green-700' :
+                                gc.status === 'blocked' ? 'bg-red-100 text-red-700' :
+                                  gc.status === 'draft' ? 'bg-yellow-100 text-yellow-700' :
+                                    'bg-gray-100 text-gray-700'
+                              }`}>
                               {gc.status}
                             </span>
                           </td>
@@ -1317,7 +1309,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
                   Resetar & Semear Dados de Relatório
                 </button>
               </div>
-              
+
               {isLoading ? (
                 <div className="flex justify-center py-12">
                   <Loader2 className="w-8 h-8 animate-spin text-brand-orange" />
@@ -1384,8 +1376,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
                               ]}
                               margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
                             >
-                              <XAxis 
-                                dataKey="name" 
+                              <XAxis
+                                dataKey="name"
                                 tick={{ fill: theme === 'dark' ? '#fff' : '#004236', fontSize: 12 }}
                               />
                               <YAxis />
@@ -1436,12 +1428,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
                                   const cellData = heatmapData.find(h => h.day === mongoDay && h.hour === hour);
                                   const intensity = cellData ? Math.min(cellData.count * 0.2, 1) : 0;
                                   return (
-                                    <div 
-                                      key={dayIdx} 
+                                    <div
+                                      key={dayIdx}
                                       className="flex-1 h-full rounded-sm transition-all hover:scale-125 hover:z-10 cursor-pointer"
-                                      style={{ 
-                                        backgroundColor: intensity > 0 
-                                          ? `rgba(251, 146, 60, ${0.1 + intensity * 0.9})` 
+                                      style={{
+                                        backgroundColor: intensity > 0
+                                          ? `rgba(251, 146, 60, ${0.1 + intensity * 0.9})`
                                           : theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,66,54,0.05)'
                                       }}
                                       title={`${cellData?.count || 0} vendas`}
@@ -1469,7 +1461,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
                   <div className="space-y-6">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                       <h3 className="text-xl font-serif italic font-bold text-brand-green dark:text-dark-text">Produtos Mais Vendidos</h3>
-                      
+
                       <div className="flex flex-wrap gap-4">
                         <select
                           value={reportFilters.size}
@@ -1583,7 +1575,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
           {activeTab === 'system' && (
             <div className="space-y-8">
               <h2 className="text-2xl font-serif italic font-bold text-brand-green dark:text-dark-text">Configurações do Sistema</h2>
-              
+
               <div className="p-8 bg-brand-lime/10 rounded-3xl border border-brand-green/5">
                 <div className="flex items-start gap-4">
                   <div className="p-3 bg-brand-orange/10 text-brand-orange rounded-2xl">
@@ -1616,17 +1608,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
                     <p className="text-brand-green/60 dark:text-dark-text/60 text-sm mb-6">
                       Exporte os dados do sistema em formato Excel (.xlsx). Você pode escolher baixar todo o banco de dados ou coleções específicas.
                     </p>
-                    
+
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
                       {['users', 'products', 'orders', 'categories', 'collections', 'newsletter', 'analytics'].map(coll => (
                         <button
                           key={coll}
                           onClick={() => toggleBackupCollection(coll)}
-                          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                            selectedBackupCollections.includes(coll)
+                          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${selectedBackupCollections.includes(coll)
                               ? 'bg-brand-orange text-white'
                               : 'bg-white dark:bg-black/40 text-brand-green/40 dark:text-dark-text/40'
-                          }`}
+                            }`}
                         >
                           {selectedBackupCollections.includes(coll) ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}
                           {coll.charAt(0).toUpperCase() + coll.slice(1)}
@@ -1682,17 +1673,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
                 <input
                   required
                   value={editingCollection.name}
-                  onChange={e => setEditingCollection({...editingCollection, name: e.target.value})}
+                  onChange={e => setEditingCollection({ ...editingCollection, name: e.target.value })}
                   className="w-full px-6 py-4 bg-brand-lime/10 dark:bg-black/40 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange dark:text-dark-text"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase tracking-widest text-brand-green/40">Descrição</label>
                 <textarea
                   rows={3}
                   value={editingCollection.description || ''}
-                  onChange={e => setEditingCollection({...editingCollection, description: e.target.value})}
+                  onChange={e => setEditingCollection({ ...editingCollection, description: e.target.value })}
                   className="w-full px-6 py-4 bg-brand-lime/10 dark:bg-black/40 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange dark:text-dark-text"
                 />
               </div>
@@ -1702,7 +1693,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
                   type="checkbox"
                   id="active"
                   checked={editingCollection.active}
-                  onChange={e => setEditingCollection({...editingCollection, active: e.target.checked})}
+                  onChange={e => setEditingCollection({ ...editingCollection, active: e.target.checked })}
                   className="w-5 h-5 rounded border-brand-green text-brand-orange focus:ring-brand-orange"
                 />
                 <label htmlFor="active" className="text-xs font-bold uppercase tracking-widest text-brand-green/60">Coleção Ativa</label>
@@ -1747,7 +1738,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
                 <input
                   required
                   value={editingCategory.name}
-                  onChange={e => setEditingCategory({...editingCategory, name: e.target.value})}
+                  onChange={e => setEditingCategory({ ...editingCategory, name: e.target.value })}
                   className="w-full px-6 py-4 bg-brand-lime/10 dark:bg-black/40 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange dark:text-dark-text"
                 />
               </div>
@@ -1756,7 +1747,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
                 <label className="text-xs font-bold uppercase tracking-widest text-brand-green/40">Descrição</label>
                 <textarea
                   value={editingCategory.description || ''}
-                  onChange={e => setEditingCategory({...editingCategory, description: e.target.value})}
+                  onChange={e => setEditingCategory({ ...editingCategory, description: e.target.value })}
                   className="w-full px-6 py-4 bg-brand-lime/10 dark:bg-black/40 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange dark:text-dark-text resize-none h-32"
                 />
               </div>
@@ -1766,7 +1757,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
                   type="checkbox"
                   id="category-active"
                   checked={editingCategory.active}
-                  onChange={e => setEditingCategory({...editingCategory, active: e.target.checked})}
+                  onChange={e => setEditingCategory({ ...editingCategory, active: e.target.checked })}
                   className="w-5 h-5 rounded border-brand-green text-brand-orange focus:ring-brand-orange"
                 />
                 <label htmlFor="category-active" className="text-xs font-bold uppercase tracking-widest text-brand-green/60">Categoria Ativa</label>
@@ -1812,7 +1803,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
                   <input
                     required
                     value={editingProduct.name}
-                    onChange={e => setEditingProduct({...editingProduct, name: e.target.value})}
+                    onChange={e => setEditingProduct({ ...editingProduct, name: e.target.value })}
                     className="w-full px-6 py-4 bg-brand-lime/10 dark:bg-black/40 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange dark:text-dark-text"
                   />
                 </div>
@@ -1822,7 +1813,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
                     required
                     type="number"
                     value={editingProduct.price}
-                    onChange={e => setEditingProduct({...editingProduct, price: Number(e.target.value)})}
+                    onChange={e => setEditingProduct({ ...editingProduct, price: Number(e.target.value) })}
                     className="w-full px-6 py-4 bg-brand-lime/10 dark:bg-black/40 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange dark:text-dark-text"
                   />
                 </div>
@@ -1831,7 +1822,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
                   <input
                     required
                     value={editingProduct.color || ''}
-                    onChange={e => setEditingProduct({...editingProduct, color: e.target.value})}
+                    onChange={e => setEditingProduct({ ...editingProduct, color: e.target.value })}
                     placeholder="Ex: Deep Ocean Blue"
                     className="w-full px-6 py-4 bg-brand-lime/10 dark:bg-black/40 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange dark:text-dark-text"
                   />
@@ -1840,7 +1831,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
                   <label className="text-xs font-bold uppercase tracking-widest text-brand-green/40">Categoria</label>
                   <select
                     value={editingProduct.category}
-                    onChange={e => setEditingProduct({...editingProduct, category: e.target.value})}
+                    onChange={e => setEditingProduct({ ...editingProduct, category: e.target.value })}
                     className="w-full px-6 py-4 bg-brand-lime/10 dark:bg-black/40 dark:text-white border-none rounded-2xl focus:ring-2 focus:ring-brand-orange transition-colors dark:[color-scheme:dark]"
                   >
                     <option value="" className={theme === 'dark' ? 'bg-black text-white' : ''}>Selecione uma categoria</option>
@@ -1855,7 +1846,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
                   <label className="text-xs font-bold uppercase tracking-widest text-brand-green/40">Coleção</label>
                   <select
                     value={editingProduct.collection}
-                    onChange={e => setEditingProduct({...editingProduct, collection: e.target.value})}
+                    onChange={e => setEditingProduct({ ...editingProduct, collection: e.target.value })}
                     className="w-full px-6 py-4 bg-brand-lime/10 dark:bg-black/40 dark:text-white border-none rounded-2xl focus:ring-2 focus:ring-brand-orange transition-colors dark:[color-scheme:dark]"
                   >
                     <option value="">{t.selectCollection}</option>
@@ -1873,7 +1864,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
                 <input
                   required
                   value={editingProduct.image}
-                  onChange={e => setEditingProduct({...editingProduct, image: e.target.value})}
+                  onChange={e => setEditingProduct({ ...editingProduct, image: e.target.value })}
                   className="w-full px-6 py-4 bg-brand-lime/10 dark:bg-black/40 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange dark:text-dark-text"
                 />
               </div>
@@ -1885,7 +1876,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
                   value={editingProduct.sizes?.join(', ') || ''}
                   onChange={e => {
                     const newSizes = e.target.value.split(',').map(s => s.trim()).filter(s => s !== '');
-                    setEditingProduct({...editingProduct, sizes: newSizes});
+                    setEditingProduct({ ...editingProduct, sizes: newSizes });
                   }}
                   placeholder="Ex: S, M, L, XL"
                   className="w-full px-6 py-4 bg-brand-lime/10 dark:bg-black/40 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange dark:text-dark-text"
@@ -1920,7 +1911,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
                   required
                   rows={3}
                   value={editingProduct.description}
-                  onChange={e => setEditingProduct({...editingProduct, description: e.target.value})}
+                  onChange={e => setEditingProduct({ ...editingProduct, description: e.target.value })}
                   className="w-full px-6 py-4 bg-brand-lime/10 dark:bg-black/40 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange dark:text-dark-text"
                 />
               </div>
@@ -1971,7 +1962,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
                   step="0.01"
                   min="0"
                   value={adjustingGiftCard.balance}
-                  onChange={e => setAdjustingGiftCard({...adjustingGiftCard, balance: e.target.value})}
+                  onChange={e => setAdjustingGiftCard({ ...adjustingGiftCard, balance: e.target.value })}
                   className="w-full px-6 py-4 bg-brand-lime/10 dark:bg-black/40 border-none rounded-2xl focus:ring-2 focus:ring-brand-orange dark:text-dark-text font-bold text-xl"
                   autoFocus
                 />
@@ -1983,10 +1974,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onProductUpdate 
 
               <div className="flex gap-4 pt-4">
                 {/* Botão de Exclusão Direta no Ajuste de Saldo */}
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  className="flex-1 text-red-500 hover:bg-red-50 border-red-100" 
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1 text-red-500 hover:bg-red-50 border-red-100"
                   onClick={() => {
                     if (adjustingGiftCard) {
                       handleDeleteGiftCard(adjustingGiftCard._id);

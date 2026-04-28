@@ -1,47 +1,31 @@
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
-import {
-  X,
-  Mail,
-  Lock,
-  User,
-  Eye,
-  EyeOff,
-  Loader2,
-  Sun,
-  Moon,
-} from "lucide-react";
-import { useAuth } from "../context/AuthContext";
-import { useLanguage } from "../context/LanguageContext";
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { X, Mail, Lock, User, Eye, EyeOff, Loader2, Sun, Moon } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess?: (mode: "login" | "signup") => void;
-  initialMode?: "login" | "signup";
+  onSuccess?: (mode: 'login' | 'signup') => void;
+  initialMode?: 'login' | 'signup';
   localCart?: any[];
 }
 
-export const AuthModal: React.FC<AuthModalProps> = ({
-  isOpen,
-  onClose,
-  onSuccess,
-  initialMode = "login",
-  localCart = [],
-}) => {
+export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess, initialMode = 'login', localCart = [] }) => {
   const { t } = useLanguage();
   const { login, register } = useAuth();
-  const [mode, setMode] = useState<"login" | "signup">(initialMode);
+  const [mode, setMode] = useState<'login' | 'signup'>(initialMode);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
   const [formData, setFormData] = useState({
-    name: "",
-    surname: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
+    name: '',
+    surname: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -50,28 +34,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setIsLoading(true);
 
     try {
-      if (mode === "signup") {
+      if (mode === 'signup') {
         if (formData.password !== formData.confirmPassword) {
           throw new Error(t.passwordsDontMatch);
         }
-        await register(
-          {
-            name: formData.name,
-            surname: formData.surname,
-            email: formData.email,
-            password: formData.password,
-            theme: (formData as any).theme || "light",
-          },
-          localCart,
-        );
+        await register({
+          name: formData.name,
+          surname: formData.surname,
+          email: formData.email,
+          password: formData.password,
+          theme: (formData as any).theme || 'light'
+        }, localCart);
       } else {
-        await login(
-          {
-            email: formData.email,
-            password: formData.password,
-          },
-          localCart,
-        );
+        await login({
+          email: formData.email,
+          password: formData.password
+        }, localCart);
       }
       onSuccess?.(mode);
       onClose();
@@ -83,7 +61,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   return (
@@ -113,10 +91,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
             <div className="text-center mb-8">
               <h2 className="text-3xl font-serif italic font-bold text-brand-green dark:text-dark-text mb-2">
-                {mode === "login" ? t.welcomeBack : t.createAccount}
+                {mode === 'login' ? t.welcomeBack : t.createAccount}
               </h2>
               <p className="text-brand-green/60 dark:text-dark-text/60 text-sm font-medium">
-                {mode === "login" ? t.loginSubtitle : t.signupSubtitle}
+                {mode === 'login'
+                  ? t.loginSubtitle
+                  : t.signupSubtitle}
               </p>
             </div>
 
@@ -127,7 +107,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              {mode === "signup" && (
+              {mode === 'signup' && (
                 <div className="grid grid-cols-2 gap-4">
                   <div className="relative">
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-brand-green/20 dark:text-dark-text/20" />
@@ -184,15 +164,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-brand-green/20 dark:text-dark-text/20 hover:text-brand-orange transition-colors"
                 >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
 
-              {mode === "signup" && (
+              {mode === 'signup' && (
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-brand-green/20 dark:text-dark-text/20" />
                   <input
@@ -207,37 +183,28 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 </div>
               )}
 
-              {mode === "signup" && (
+              {mode === 'signup' && (
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-brand-green/60 dark:text-dark-text/60 ml-2">
-                    {t.theme}
-                  </label>
+                  <label className="text-xs font-bold uppercase tracking-widest text-brand-green/60 dark:text-dark-text/60 ml-2">{t.theme}</label>
                   <div className="grid grid-cols-2 gap-4">
                     <button
                       type="button"
-                      onClick={() =>
-                        setFormData((prev) => ({ ...prev, theme: "light" }))
-                      }
-                      className={`py-3 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
-                        (formData as any).theme === "light" ||
-                        !(formData as any).theme
-                          ? "bg-brand-green text-white shadow-lg"
-                          : "bg-brand-lime/10 dark:bg-white/5 text-brand-green dark:text-dark-text hover:bg-brand-lime/20 dark:hover:bg-white/10"
-                      }`}
+                      onClick={() => setFormData(prev => ({ ...prev, theme: 'light' }))}
+                      className={`py-3 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${(formData as any).theme === 'light' || !(formData as any).theme
+                          ? 'bg-brand-green text-white shadow-lg'
+                          : 'bg-brand-lime/10 dark:bg-white/5 text-brand-green dark:text-dark-text hover:bg-brand-lime/20 dark:hover:bg-white/10'
+                        }`}
                     >
                       <Sun className="w-4 h-4" />
                       {t.light}
                     </button>
                     <button
                       type="button"
-                      onClick={() =>
-                        setFormData((prev) => ({ ...prev, theme: "dark" }))
-                      }
-                      className={`py-3 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
-                        (formData as any).theme === "dark"
-                          ? "bg-brand-green text-white shadow-lg"
-                          : "bg-brand-lime/10 dark:bg-white/5 text-brand-green dark:text-dark-text hover:bg-brand-lime/20 dark:hover:bg-white/10"
-                      }`}
+                      onClick={() => setFormData(prev => ({ ...prev, theme: 'dark' }))}
+                      className={`py-3 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${(formData as any).theme === 'dark'
+                          ? 'bg-brand-green text-white shadow-lg'
+                          : 'bg-brand-lime/10 dark:bg-white/5 text-brand-green dark:text-dark-text hover:bg-brand-lime/20 dark:hover:bg-white/10'
+                        }`}
                     >
                       <Moon className="w-4 h-4" />
                       {t.dark}
@@ -253,20 +220,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               >
                 {isLoading ? (
                   <Loader2 className="w-6 h-6 animate-spin" />
-                ) : mode === "login" ? (
-                  t.loginButton
                 ) : (
-                  t.signupButton
+                  mode === 'login' ? t.loginButton : t.signupButton
                 )}
               </button>
             </form>
 
             <div className="mt-8 text-center">
               <button
-                onClick={() => setMode(mode === "login" ? "signup" : "login")}
+                onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
                 className="text-brand-green/60 dark:text-dark-text/60 text-sm font-bold hover:text-brand-orange transition-colors"
               >
-                {mode === "login"
+                {mode === 'login'
                   ? t.dontHaveAccountAction
                   : t.alreadyHaveAccountAction}
               </button>

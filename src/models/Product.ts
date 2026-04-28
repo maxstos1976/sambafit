@@ -7,8 +7,8 @@ const productSchema = new mongoose.Schema({
   image: { type: String, required: true },
   description: { type: String, required: true },
   color: { type: String, required: true },
-  collection: { 
-    type: String, 
+  collection: {
+    type: String,
     required: true
   },
   sizes: [{ type: String }],
@@ -18,6 +18,9 @@ const productSchema = new mongoose.Schema({
     default: {}
   },
   totalSold: { type: Number, default: 0 }
-}, { timestamps: true });
+}, {
+  timestamps: true,
+  suppressReservedKeysWarning: true
+});
 
 export const Product = mongoose.model('Product', productSchema);
